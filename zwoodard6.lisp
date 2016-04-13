@@ -30,8 +30,9 @@
     (labels ((correct-way (edge)
 			  (eq (cadr edge) direction)))
 	    (let ((next (find-if #'correct-way (cdr (assoc *location* *edges*)))))
-	      (if (eq (car next) 'basement) ;moveing into basement
-		  (setq *in-dungeon* T))
+	      (when (eq (car next) 'basement) ;Moving into basement
+		(setq *in-dungeon* T)
+		(build-room location-x location-y))
 	      (if next 
 		  (progn (setf *location* (car next)) 
 			 (look))
