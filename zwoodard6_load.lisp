@@ -1,4 +1,8 @@
 ;;Game state variables
+;Difficulty from 0 to 100, where 100 is the hardest
+(defparameter *difficulty* 40)
+;Used for basement combat/traps, when it hits 0 you die
+(defparameter *health* 10)
 (defparameter *computer-assembled* nil)
 (defparameter *in-dungeon* nil)
 (defparameter *allowed-commands* '(look walk pickup inventory))
@@ -190,3 +194,32 @@
 	       (remove-all-from-inven '(ram cpu gpu psu case motherboard))
 	       (setf *computer-assembled* 't)
 	       '(you have assembled the computer))))
+
+;;;Macro dungeon-game-action
+;;;Creates a command <command>
+;;;Checks to see if the room-list is empty
+;;;If non-empty, executes body
+(defmacro dungeon-game-action (command room-list &body body)
+  `(progn (defun ,command ()
+	    (when ,room-list
+	      ,@body))
+	  (pushnew ',command *allowed-commands*)))
+
+(dungeon-game-action fight room-monsters
+		     (if (>= (random 100) *difficulty*)
+			 (progn
+			   (setq room-monsters ())
+			   '(you have debugged the error)
+			 )
+		         (progn
+                           (inc-health 1)
+			   '(you have been defeated by the error. you lose 1hp))))
+
+(dungeon-game-action disarm room-traps
+		     (if (>= (random 100) *difficulty*)
+			 (progn
+			   '(you have disarmed the trap)
+			   (setq room-traps ()))
+		         (progn
+			   (decr-health 1)
+			   '(you make a mistake and are injured by the trap))))
