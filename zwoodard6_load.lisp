@@ -212,14 +212,14 @@
 			   '(you have debugged the error)
 			 )
 		         (progn
-                           (inc-health 1)
+                           (decr-health 1)
 			   '(you have been defeated by the error. you lose 1hp))))
 
 (dungeon-game-action disarm room-traps
 		     (if (>= (random 100) *difficulty*)
 			 (progn
-			   '(you have disarmed the trap)
-			   (setq room-traps ()))
+			   (setq room-traps ())
+		           '(you have disarmed the trap))
 		         (progn
 			   (decr-health 1)
 			   '(you make a mistake and are injured by the trap))))
