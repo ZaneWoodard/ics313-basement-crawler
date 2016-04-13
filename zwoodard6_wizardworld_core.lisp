@@ -41,14 +41,14 @@
 ;;;Increases the player's health by x
 ;;;Returns the current health
 (defun inc-health (x)
-  (setq health (+ health x)))
+  (setq *health* (+ *health* x)))
 
 ;;;Function decr-health
 ;;;Decreases the player's health by x
 ;;;Returns the current health
 (defun decr-health (x)
-  (setq health (- health x))
+  (setq *health* (- *health* x))
   (when (<= health 0)
     (quit)
     (game-print '(you have died before you could assemble the computer!)))
-  (health))
+  (*health*))
