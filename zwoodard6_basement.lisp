@@ -15,6 +15,10 @@
 
 (defun dungeon-walk (direction)
   (cond
+   (room-traps ;Cannot leave until all traps disarmed
+    (return-from dungeon-walk '(you have not disarmed all the traps in the room.)))
+   (room-monsters ;Cannot leave until all traps disarmed
+    (return-from dungeon-walk '(you have not fought all the errors in the room.)))
    ((eq direction 'north) (setq location-y (1+ location-y)))
    ((eq direction 'south) (setq location-y (1- location-y)))
    ((eq direction 'east) (setq location-x (1+ location-x)))
@@ -23,7 +27,7 @@
     (setq *in-dungeon* nil)
     (return-from dungeon-walk (walk direction)))
    (T (return-from dungeon-walk '(you cannot go that way.)))
-  )
+   )
   (build-room location-x location-y)
   (dungeon-look)
 )
