@@ -69,18 +69,7 @@
 (defparameter *dungeon-items* '((mountain-dew (warm mountain dew))
 				(doritos (fresh bag of doritos))
 				(cheetos (unopened bag of cheetos))
-			       ))
-
-;;Define the help content
-(defparameter *help* '((***WIZARDS WORLD HELP***)))
-(progn
-  (nconc *help* '((The goal of this game is to assemble a computer.)))
-  (nconc *help* '((Explore rooms\, pickup objects\, and use them to progress)))
-  (nconc *help* '((Here is a list of commands to help you do this\:)))
-  (nconc *help*
-	  (mapcar #'(lambda (x) (list '--> x)) *allowed-commands*))
-)
-  
+			       ))  
 
 ;;;Function simple-game-action
 ;;;For game actions with no objects or location requirements
@@ -92,7 +81,11 @@
 
 ;;Define the main help function, prints contents of *help*
 (simple-game-action help
-		        (loop for line on *help* do (game-print (car line))))
+		    (let ((help-text (append '((The goal of this game is to assemble a computer.))
+					     '((Explore rooms\, pickup objects\, and use them to progress.))
+					     '((Here is a list of commands to help you do this\:))
+					     (mapcar #'(lambda (x) (list '--> x)) *allowed-commands*))))
+		      (loop for line on help-text do (game-print (car line)))))
 ;;Define the aliases
 (simple-game-action h (help))
 (simple-game-action ? (help))
@@ -201,25 +194,27 @@
 ;;;If non-empty, executes body
 (defmacro dungeon-game-action (command room-list &body body)
   `(progn (defun ,command ()
-	    (when ,room-list
-	      ,@body))
+	    (cond
+	     ((not *in-dungeon*) '(you cannot do this outside of the basement.))
+	     ((endp ,room-list) '(this room is already cleared.))
+	     (,room-list
+	      ,@body)))
 	  (pushnew ',command *allowed-commands*)))
 
 (dungeon-game-action fight room-monsters
-		     (if (>= (random 100) *difficulty*)
-			 (progn
-			   (setq room-monsters ())
-			   '(you have debugged the error)
-			 )
-		         (progn
-                           (decr-health 1)
-			   '(you have been defeated by the error. you lose 1hp))))
+		     (cond
+		      ((>= (random 100) *difficulty*)
+		       (setq room-monsters ())
+		       '(you have debugged the error))
+		      (T
+		       (decr-health 1)
+		       '(you have been defeated by the error. you lose 1hp))))
 
 (dungeon-game-action disarm room-traps
-		     (if (>= (random 100) *difficulty*)
-			 (progn
-			   (setq room-traps ())
-		           '(you have disarmed the trap))
-		         (progn
-			   (decr-health 1)
-			   '(you make a mistake and are injured by the trap))))
+		     (cond
+		      ((>= (random 100) *difficulty*)
+                       (setq room-traps ())
+		       '(you have disarmed the trap))
+		      (T
+		       (decr-health 1)
+                       '(you make a mistake and are injured by the trap))))
