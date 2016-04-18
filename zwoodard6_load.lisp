@@ -270,7 +270,7 @@
 ;;;Increments *health* by a number between 0 and 5
 (defun consume (object)
   (cond
-   ((not (member object '(mountain-dew cheetos))) ;Item cannot be consumed
+   ((not (member object '(mountain-dew cheetos doritos))) ;Item cannot be consumed
     '(that item is not consumable.))
    ((have object) 
     ;Remove the object from the inventory
