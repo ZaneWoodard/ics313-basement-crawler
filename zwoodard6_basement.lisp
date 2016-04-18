@@ -79,6 +79,10 @@
 (defmacro room-list-add (room-list seed allowed-list)
   `(setq ,room-list (cons (car (nth (mod ,seed (length ,allowed-list)) ,allowed-list)) ,room-list))
 )
+
+;;;Function build-room
+;;;Creates a room based on the x & y input numbers
+;;;Returns a basement room represented as a list of lists
 (defun build-room (x y)
   (let ((seed (rand x y))
 	(monsters ())
@@ -96,3 +100,16 @@
     (setq room-decorations decorations)
     (list 'monsters monsters 'items items 'traps traps 'decorations decorations) 
 ))
+
+
+;;;Function monbster-drop-item
+;;;Randomly picks an item from the *valid-parts* list and returns it
+;;;If no drop should be given, returns NIL
+(defun monster-drop-item ()
+  (cond
+   ((>= (random 100) *difficulty*) ;Random chance to drop item
+    ;Randomly select a part type
+    (let ((part-list (cadr (nth (random (length *valid-parts*)) *valid-parts*))))
+      ;Randomly select a part of the type
+      (nth (random (length part-list)) part-list)
+      ))))

@@ -23,39 +23,36 @@
                         (attic (living-room downstairs ladder))))
 ;;COMPUTER VARIABLES
 (defparameter *assembled-parts* '())
-(defparameter *valid-ram* '(
-			    (2gb-ram)
-			    (4gb-ram)
-			    (8gb-ram)))
-(defparameter *valid-gpu* '(
-			    (gtx-660)
-			    (gtx-750)
-			    (r7-370)
-			    (gtx-950)
-			    (r9-390)
-			    (gtx-980)
+(defparameter *valid-ram* '(2gb-ram
+			    4gb-ram
+			    8gb-ram))
+(defparameter *valid-gpu* '(gtx-660
+			    gtx-750
+			    r7-370
+			    gtx-950
+			    r9-390
+			    gtx-980
 			    ))
-(defparameter *valid-cpu* '(
-			    (i3-6100)
-			    (i5-6400)
-			    (i5-6600k)
-			    (i7-6700k)
-			    (i7-5820k)
-			    (i7-5960x)
+(defparameter *valid-cpu* '(i3-6100
+			    i5-6400
+			    i5-6600k
+			    i7-6700k
+			    i7-5820k
+			    i7-5960x
 			    ))
-(defparameter *valid-hdd* '((128gb-hdd)
-			   (256gb-hdd)
-			   (512gb-hdd)
-			   (1tb-hdd)
-			   (2tb-hdd)
-			   (4tb-hdd)
-			   (128gb-ssd)
-			   (256gb-ssd)
-			   (512gb-ssd)
-			   (1tb-ssd)
-			   (2tb-ssd)
-			   (4tb-ssd)			   
-			   ))
+(defparameter *valid-hdd* '(128gb-hdd
+			    256gb-hdd
+			    512gb-hdd
+			    1tb-hdd
+			    2tb-hdd
+			    4tb-hdd
+			    128gb-ssd
+			    256gb-ssd
+			    512gb-ssd
+			    1tb-ssd
+			    2tb-ssd
+			    4tb-ssd			   
+			    ))
 (defparameter *valid-parts* (list
 			     (list 'ram *valid-ram*)
 			     (list 'gpu *valid-gpu*)
@@ -94,7 +91,15 @@
 (defparameter *dungeon-items* '((mountain-dew (warm mountain dew))
 				(doritos (fresh bag of doritos))
 				(cheetos (unopened bag of cheetos))
-			       ))  
+			       ))
+;;Add the dungeon items to the object list
+(loop for item in *dungeon-items*
+      do (push (car item) *objects*))
+;;Add the computer parts to the object list
+(loop for sublist in *valid-parts*
+      do (loop for item in (cadr sublist)
+	       do (push item *objects*)))
+
 
 ;;;Function simple-game-action
 ;;;For game actions with no objects or location requirements
@@ -226,15 +231,26 @@
 	      ,@body)))
 	  (pushnew ',command *allowed-commands*)))
 
+;;;Creates a SPEL that allows fighing error monsters
 (dungeon-game-action fight room-monsters
 		     (cond
-		      ((>= (random 100) *difficulty*)
-		       (setq room-monsters ())
-		       '(you have debugged the error))
+		      ((>= (random 100) *difficulty*) ;Random chance to win
+		       (setq room-monsters ()) ;Clear room of monsters
+		       (let ((drops (monster-drop-item))) ;Get dropped items
+			 (append ;Build return message
+			  '(you have debugged the error.)
+			  '(it has dropped\:)
+			  (if drops
+			      (progn ;There is a drop
+				(nconc room-items drops) ;Add item to the room
+				(list drops))
+			    '(nothing)) ;No drop
+			  )))
 		      (T
 		       (decr-health 1)
 		       '(you have been defeated by the error. you lose 1hp))))
 
+;;;Creates a SPEL that allows disarming traps in the current room
 (dungeon-game-action disarm room-traps
 		     (cond
 		      ((>= (random 100) *difficulty*)
@@ -243,3 +259,26 @@
 		      (T
 		       (decr-health 1)
                        '(you make a mistake and are injured by the trap))))
+
+;;;Creates a SPEL that allows the player to check their health
+(simple-game-action health `(your health is currently ,*health*))
+
+;;Does not fit into existing macros
+;;;Function consume
+;;;Takes a consumable object as a parameter
+;;;Remove the object from the inventory
+;;;Increments *health* by a number between 0 and 5
+(defun consume (object)
+  (cond
+   ((not (member object '(mountain-dew cheetos))) ;Item cannot be consumed
+    '(that item is not consumable.))
+   ((have object) 
+    ;Remove the object from the inventory
+    (setq *object-locations*
+	  (remove 'cheetos *object-locations*
+		  :test #'(lambda (x y) (eq (car y) x))))
+    `(you have consumed the ,object .your health is now ,(incf *health* (random 5)) hp)
+    )
+   (T ;Item is not in inventory, but is consumable
+    '(you do not have that item))))
+(pushnew 'consume *allowed-commands*)
