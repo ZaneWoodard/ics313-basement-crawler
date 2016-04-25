@@ -3,13 +3,16 @@
 (defparameter *difficulty* 40)
 ;Used for basement combat/traps, when it hits 0 you die
 (defparameter *health* 10)
-(defparameter *computer-assembled* nil)
+;Set to true after talking to wizard for first time
+(defparameter *started-quest* nil)
+;Set to true after completeing quest, exit when true
+(defparameter *victory* nil)
+;Set to true when in basement, changes execution path for many functions
 (defparameter *in-dungeon* nil)
+
 (defparameter *allowed-commands* '(look walk pickup inventory))
-(defparameter *objects* '(whiskey bucket frog chain))
-(defparameter *object-locations* '((whiskey living-room)
-                                   (bucket living-room)
-                                   (chain garden)))
+(defparameter *objects* '(whiskey))
+(defparameter *object-locations* '((whiskey living-room)))
 (defparameter *location* 'living-room)
 ;;Defines a list of "nodes" where each node is a location and its description                                  
 (defparameter *nodes* '((living-room (you are in the living-room.
@@ -21,8 +24,6 @@
 (defparameter *edges* '((living-room (garden west door) (attic upstairs ladder))
                         (garden (living-room east door))
                         (attic (living-room downstairs ladder))))
-;;COMPUTER VARIABLES
-(defparameter *assembled-parts* '())
 (defparameter *valid-ram* '(2gb-ram
 			    4gb-ram
 			    8gb-ram))
@@ -111,10 +112,11 @@
 
 ;;Define the main help function, prints contents of *help*
 (simple-game-action help
-		    (let ((help-text (append '((The goal of this game is to assemble a computer.))
+		    (let ((help-text (append '((The goal of this game is to retrieve computer parts for the wizard))
 					     '((Explore rooms\, pickup objects\, and use them to progress.))
 					     '((Here is a list of commands to help you do this\:))
-					     (mapcar #'(lambda (x) (list '--> x)) *allowed-commands*))))
+					     (mapcar #'(lambda (x) (list '--> x)) *allowed-commands*)
+					     '(Consult the user manual for details on each command))))
 		      (loop for line on help-text do (game-print (car line)))))
 ;;Define the aliases
 (simple-game-action h (help))
@@ -196,27 +198,9 @@
 (defmacro load-custom-game ()
   `(progn
      (new-location 'basement '(you are in a dark basement.))
-     (new-object 'book 'living-room)
      (new-path 'basement 'living-room 'staircase 'upstairs 'downstairs)
-;     (new-path 'basement 'living-room 'ladder 'upstairs 'downstairs)))
 ))
 (load-custom-game)
-(game-action assemble case motherboard living-room
-	     (cond
-	      ;;Cannot assemble it twice check
-	      (*computer-assembled* '(you have already assembled the computer))
-	      ;;Check for all the necessary components
-	      ((not (have 'ram)) '(you do not have ram))
-	      ((not (have 'cpu)) '(you do not have a cpu))
-	      ((not (have 'gpu)) '(you do not have a gpu))
-	      ((not (have 'psu)) '(you do not have a psu))
-	      ;;Assemble the computer
-	      (T
-	       (new-object 'computer *location*)
-	       (pickup 'computer)
-	       (remove-all-from-inven '(ram cpu gpu psu case motherboard))
-	       (setf *computer-assembled* 't)
-	       '(you have assembled the computer))))
 
 ;;;Macro dungeon-game-action
 ;;;Creates a command <command>
@@ -236,14 +220,14 @@
 		     (cond
 		      ((>= (random 100) *difficulty*) ;Random chance to win
 		       (setq room-monsters ()) ;Clear room of monsters
-		       (let ((drops (monster-drop-item))) ;Get dropped items
+		       (let ((drop (monster-drop-item))) ;Get dropped items
 			 (append ;Build return message
 			  '(you have debugged the error.)
-			  '(it has dropped\:)
-			  (if drops
+			  '(you have received )
+			  (if drop
 			      (progn ;There is a drop
-				(nconc room-items drops) ;Add item to the room
-				(list drops))
+				(force-pickup drop) ;Add item to inventory
+				(list drop))
 			    '(nothing)) ;No drop
 			  )))
 		      (T
@@ -263,6 +247,46 @@
 ;;;Creates a SPEL that allows the player to check their health
 (simple-game-action health `(your health is currently ,*health*))
 
+;;;Creates a SPEL that allows the player to cheat
+;;;Gives all items to player, sets location to living-room
+(simple-game-action cheat
+		    (progn
+		      (loop for object in *objects*
+			    do (force-pickup object))
+		      (setq *location* 'living-room)
+		      (setq *in-dungeon* nil)
+		      '(you have cheated. you have all items and have been returned to the living room)))
+;;;Creates a SPEL that returns the player back to the first basement room
+(simple-game-action backtrack
+		    (progn
+		      (setq location-x 50)
+		      (setq location-y 50)
+		      `(you have been returned to the first dungeon room.)))
+
+;;;Creates a SPEL to interact with the wizard
+(simple-game-action talk
+		    (cond
+		     ((not (eq *location* 'living-room)) ;Error check: wrong location
+		      '(you must be in the living room to talk to the wizard))
+		     (T ;Correct location
+		      (append
+		       '(you lean in close and the wizard whispers to you\:)
+		       (cond
+			((and *started-quest* (have-all-parts)) ;case: started-quest and completed it
+			 (setq *victory* T)
+			 '(you have everything i need! thank you. i will return you to where you came from now)
+			 )
+			(*started-quest* ;case: started quest, not complete
+			 '(you do not have all the parts! Come back once you have gotten a gpu\, cpu\, hdd\, and ram.)
+			 )
+			(T ;case: quest not started, never talked to wizard before
+			 (setq *started-quest* T)
+			 (append
+			  '(i have brought you here for one reason.)
+			  '(i want a sweet new desktop but am far to weak to build one.)
+			  '(you must venture into my basement and fight coding errors monsters.)
+			  '(luckily i already have a power supply\, case\, and montherboard.)
+			  '(Come back once you have gotten a gpu\, cpu\, hdd\, and ram.))))))))
 ;;Does not fit into existing macros
 ;;;Function consume
 ;;;Takes a consumable object as a parameter
@@ -275,7 +299,7 @@
    ((have object) 
     ;Remove the object from the inventory
     (setq *object-locations*
-	  (remove 'cheetos *object-locations*
+	  (remove object *object-locations*
 		  :test #'(lambda (x y) (eq (car y) x))))
     `(you have consumed the ,object .your health is now ,(incf *health* (random 5)) hp)
     )

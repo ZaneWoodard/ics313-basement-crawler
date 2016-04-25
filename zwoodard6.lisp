@@ -41,6 +41,11 @@
 ;;;Enters the custom READ-EVAL-PRINT loop for the game
 (defun game-repl ()
     (let ((cmd (game-read)))
-        (unless (eq (car cmd) 'quit)
-            (game-print (game-eval cmd))
-            (game-repl))))
+      (unless (or *victory* (eq (car cmd) 'quit))
+	(game-print (game-eval cmd))
+	(game-repl))))
+
+(progn
+  (game-print (look))
+  (game-repl)
+)

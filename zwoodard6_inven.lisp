@@ -39,7 +39,6 @@
     (member object (cdr (inventory))))
 
 
-
 ;;;Function remove-all-from-inven
 ;;;Takes in a list of objects
 ;;;Removes all of the objects from *inventory*
@@ -52,3 +51,11 @@
    )
   )
 )
+
+;;;Function have-all-parts
+;;;Returns true when the inventory contains at least 1 item of each type:
+;;;RAM, CPU, GPU, and HDD
+(defun have-all-parts ()
+  (loop for type in '(ram cpu gpu hdd)
+	always (loop for item in (cadr (assoc type *valid-parts*))
+		     thereis (have item))))

@@ -1,0 +1,140 @@
+Zanes-MacBook-Pro:ics313-basement-crawler zane$ clisp
+  i i i i i i i       ooooo    o        ooooooo   ooooo   ooooo
+  I I I I I I I      8     8   8           8     8     o  8    8
+  I  \ `+' /  I      8         8           8     8        8    8
+   \  `-+-'  /       8         8           8      ooooo   8oooo
+    `-__|__-'        8         8           8           8  8
+        |            8     o   8           8     o     8  8
+  ------+------       ooooo    8oooooo  ooo8ooo   ooooo   8
+
+Welcome to GNU CLISP 2.49 (2010-07-07) <http://clisp.cons.org/>
+
+Copyright (c) Bruno Haible, Michael Stoll 1992, 1993
+Copyright (c) Bruno Haible, Marcus Daniels 1994-1997
+Copyright (c) Bruno Haible, Pierpaolo Bernardi, Sam Steingold 1998
+Copyright (c) Bruno Haible, Sam Steingold 1999-2000
+Copyright (c) Sam Steingold, Bruno Haible 2001-2010
+
+Type :h and hit Enter for context help.
+
+[1]> (load "zwoodard6.lisp")
+;; Loading file zwoodard6.lisp ...
+;;  Loading file zwoodard6_util.lisp ...
+;;  Loaded file zwoodard6_util.lisp
+;;  Loading file zwoodard6_wizardworld_core.lisp ...
+;;  Loaded file zwoodard6_wizardworld_core.lisp
+;;  Loading file zwoodard6_load.lisp ...
+;;  Loaded file zwoodard6_load.lisp
+;;  Loading file zwoodard6_inven.lisp ...
+;;  Loaded file zwoodard6_inven.lisp
+;;  Loading file zwoodard6_basement.lisp ...
+;;  Loaded file zwoodard6_basement.lisp
+You are in the living-room. A wizard is snoring loudly on the
+ couch. There is a door going west from here. There is a ladder
+ going upstairs from here. There is a staircase going downstairs
+ from here. You see a whiskey on the floor.
+talk
+You lean in close and the wizard whispers to |you:| i have brought
+ you here for one reason. I want a sweet new desktop but am far to
+ weak to build one. You must venture into my basement and fight
+ coding errors monsters. Luckily i already have a power |supply,|
+ |case,| and montherboard. Come back once you have gotten a |gpu,|
+ |cpu,| |hdd,| and ram.
+walk downstairs
+You are in a small dark room... There are doors to the north south
+ east and west. There is a staircase going upstairs from here. You
+ see a bleached white skull on the floor. Watch out! There is a
+ spike pit filled with bones preventing you from leaving the room.
+ there is a unopened bag of cheetos on the floor.
+disarm
+You have disarmed the trap
+fight
+This room is already cleared.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. There is a unchecked race condition error in the
+ middle of the room.
+fight
+You have debugged the error. You have received 2gb-ram
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. You see a suit of shiny armor on the floor. There is
+ a unsafe casting error in the middle of the room. There is a warm
+ mountain dew on the floor.
+disarm
+This room is already cleared.
+fight
+You have debugged the error. You have received 4gb-ram
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. You see a bleached white skull on the floor. Watch
+ out! There is a spike pit filled with bones preventing you from
+ leaving the room. There is a unopened bag of cheetos on the floor.
+fight
+This room is already cleared.
+disarm
+You have disarmed the trap
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. You see a suit of shiny armor on the floor. There is
+ a fresh bag of doritos on the floor.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. There is a vile undefined variable error in the
+ middle of the room.
+fight
+You have debugged the error. You have received 2gb-ram
+fight
+This room is already cleared.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west.
+walk north
+You are in a small dark room... There are doors to the north south
+ east and west. You see a bleached white skull on the floor. Watch
+ out! There is a spike pit filled with bones preventing you from
+ leaving the room. There is a unopened bag of cheetos on the floor.
+disarm
+You have disarmed the trap
+cheat
+You have cheated. You have all items and have been returned to the
+ living room
+look
+You are in a small dark room... There are doors to the north south
+ east and west. You see a bleached white skull on the floor. There
+ is a unopened bag of cheetos on the floor.
+backtrack
+You have been returned to the first dungeon room.
+walk upstairs
+You are in the attic. There is a giant welding torch in the corner.
+ there is a ladder going downstairs from here.
+inventory
+Items- 4tb-ssd 2tb-ssd 1tb-ssd 512gb-ssd 256gb-ssd 128gb-ssd
+ 4tb-hdd 2tb-hdd 1tb-hdd 512gb-hdd 256gb-hdd 128gb-hdd i7-5960x
+ i7-5820k i7-6700k i5-6600k i5-6400 i3-6100 gtx-980 r9-390 gtx-950
+ r7-370 gtx-750 gtx-660 8gb-ram 4gb-ram 2gb-ram cheetos doritos
+ mountain-dew whiskey
+talk
+You must be in the living room to talk to the wizard
+walk downstairs
+You are in the living-room. A wizard is snoring loudly on the
+ couch. There is a door going west from here. There is a ladder
+ going upstairs from here. There is a staircase going downstairs
+ from here.
+talk
+You lean in close and the wizard whispers to |you:| you have
+ everything i need! Thank you. I will return you to where you came
+ from now
+
+;; Loaded file zwoodard6.lisp
+T
+[2]> 
