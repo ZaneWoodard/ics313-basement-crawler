@@ -19,7 +19,7 @@
     (setq room-items (remove object room-items))
     (push (list object 'body) *object-locations*)
     `(you are now carrying the ,object))
-    (t 'you cannot get that.)))
+   (t '(you cannot get that.))))
 ;;;Function force-pickup
 ;;;Like pickup, but adds the object regardless of location, good for testing
 (defun force-pickup (object)
